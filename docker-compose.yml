@@ -1,0 +1,37 @@
+services:
+  db:  # Servicio de base de datos PostgreSQL con soporte para PostGIS
+    image: postgis/postgis:latest  # Imagen oficial de PostGIS
+    container_name: postgres_postgis  # Nombre personalizado del contenedor
+    restart: always  # Reiniciar automáticamente si el contenedor se cae o al reiniciar la máquina
+    environment:
+      POSTGRES_DB: ${DB_NAME}  # Nombre de la base de datos inicial
+      POSTGRES_USER: ${DB_USER}  # Usuario de la base de datos
+      POSTGRES_PASSWORD: ${DB_PASSWORD}  # Contraseña del usuario
+    ports:
+      - "${DB_PORT}:${DB_PORT}"  # Expone el puerto 5432 (PostgreSQL) al host para poder conectarse desde QGIS o pgAdmin
+    volumes:
+      - pgdata:/var/lib/postgresql/data  # Volumen persistente para guardar datos de la base
+    networks:
+      - sig-network  # Red compartida para comunicarse con otros servicios (como pgAdmin)
+
+  pgadmin:  # Servicio de interfaz gráfica para administrar PostgreSQL
+    image: dpage/pgadmin4:latest  # Imagen oficial de pgAdmin 4
+    container_name: pgadmin  # Nombre personalizado del contenedor
+    restart: always  # Reinicio automático
+    environment:
+      PGADMIN_DEFAULT_EMAIL: ${PGADMIN_DEFAULT_EMAIL}  # Usuario por defecto para login en la web de pgAdmin
+      PGADMIN_DEFAULT_PASSWORD: ${PGADMIN_DEFAULT_PASSWORD}  # Contraseña para ese usuario
+    ports:
+      - "5050:80"  # Mapea el puerto 80 del contenedor al 5050 del host (accedés en http://localhost:5050)
+    volumes:
+      - pgadmin-data:/var/lib/pgadmin  # Volumen persistente para guardar configuraciones de pgAdmin
+    networks:
+      - sig-network  # Conectado a la misma red que el contenedor de PostgreSQL
+
+volumes:
+  pgdata:  # Define el volumen para PostgreSQL
+  pgadmin-data:  # Define el volumen para pgAdmin
+
+networks:
+  sig-network:  # Crea una red virtual compartida
+    driver: bridge  # Tipo de red (bridge = conexión privada entre contenedores)
