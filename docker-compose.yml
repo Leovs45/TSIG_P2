@@ -11,6 +11,7 @@ services:
       - "${DB_PORT}:${DB_PORT}"  # Expone el puerto 5432 (PostgreSQL) al host para poder conectarse desde QGIS o pgAdmin
     volumes:
       - pgdata:/var/lib/postgresql/data  # Volumen persistente para guardar datos de la base
+      - ./datos_practico:/mnt/datos_practico # Volumen para cargar los datos del práctico
     networks:
       - sig-network  # Red compartida para comunicarse con otros servicios (como pgAdmin)
 
@@ -30,7 +31,7 @@ services:
 
 volumes:
   pgdata:  # Define el volumen para PostgreSQL
-  pgadmin-data:  # Define el volumen para pgAdmin
+  pgadmin-data:  # Define el volumen para pgAdmin 
 
 networks:
   sig-network:  # Crea una red virtual compartida
